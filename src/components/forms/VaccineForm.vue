@@ -39,23 +39,21 @@
               icon="calendar-days"
             />
 
-            <Input
-              id="veterinarian"
-              label="Veterinário"
-              v-model="form.veterinarian"
-              :error="errors.veterinarian"
-              icon="user"
-              placeholder="Nome do veterinário"
-            />
-
-            <Input
-              id="batch"
-              label="Lote"
-              v-model="form.batch"
-              :error="errors.batch"
-              icon="hash"
-              placeholder="Número do lote"
-            />
+            <div class="input-group input-group-full">
+              <label class="input-label" for="batch">
+                <span class="label-text">Observações / Lote</span>
+              </label>
+              <div class="input-wrapper">
+                <Icon name="file-text" :size="18" class="input-icon" />
+                <textarea
+                  id="batch"
+                  class="input input-with-icon"
+                  v-model="form.batch"
+                  rows="2"
+                  placeholder="Observações sobre a vacina ou número do lote..."
+                ></textarea>
+              </div>
+            </div>
           </div>
 
           <div class="modal-footer">
@@ -104,7 +102,6 @@ const form = reactive({
   name: '',
   applicationDate: '',
   nextDoseDate: '',
-  veterinarian: '',
   batch: ''
 })
 
@@ -134,7 +131,10 @@ const handleSubmit = async () => {
 
   try {
     const data = {
-      ...form,
+      vaccineName: form.name,
+      appliedDate: form.applicationDate,
+      nextDoseDate: form.nextDoseDate || null,
+      notes: form.batch || '',
       petId: parseInt(props.petId)
     }
 
@@ -156,18 +156,16 @@ watch(() => props.vaccineId, async (newId) => {
   if (newId) {
     await fetchVaccine(newId)
     if (vaccine.value) {
-      form.name = vaccine.value.name || ''
-      form.applicationDate = vaccine.value.applicationDate ? vaccine.value.applicationDate.split('T')[0] : ''
-      form.nextDoseDate = vaccine.value.nextDoseDate ? vaccine.value.nextDoseDate.split('T')[0] : ''
-      form.veterinarian = vaccine.value.veterinarian || ''
-      form.batch = vaccine.value.batch || ''
+      form.name = vaccine.value.vaccineName || vaccine.value.name || ''
+      form.applicationDate = vaccine.value.appliedDate ? (vaccine.value.appliedDate.split('T')[0] || vaccine.value.appliedDate) : ''
+      form.nextDoseDate = vaccine.value.nextDoseDate ? (vaccine.value.nextDoseDate.split('T')[0] || vaccine.value.nextDoseDate) : ''
+      form.batch = vaccine.value.notes || ''
     }
   } else {
     // Limpar formulário quando não há ID (modo criar)
     form.name = ''
     form.applicationDate = ''
     form.nextDoseDate = ''
-    form.veterinarian = ''
     form.batch = ''
   }
 }, { immediate: true })

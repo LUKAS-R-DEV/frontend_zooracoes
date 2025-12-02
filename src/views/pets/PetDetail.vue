@@ -66,18 +66,26 @@
           <div v-for="vaccine in vaccinesList" :key="vaccine.id" style="padding: var(--spacing-md); border-bottom: 1px solid var(--color-gray-200); display: flex; align-items: start; gap: 12px">
             <Icon name="syringe" :size="20" style="color: var(--color-primary); flex-shrink: 0; margin-top: 2px" />
             <div style="flex: 1">
-              <div style="font-weight: 500">{{ vaccine.name }}</div>
+              <div style="font-weight: 500">{{ vaccine.vaccineName || vaccine.name || '-' }}</div>
               <div style="font-size: 0.875rem; color: var(--color-gray-600)">
-                Aplicada em: {{ formatDate(vaccine.applicationDate) }}
+                Aplicada em: {{ formatDate(vaccine.appliedDate || vaccine.applicationDate) }}
               </div>
               <div v-if="vaccine.nextDoseDate" style="font-size: 0.875rem; color: var(--color-gray-600)">
                 Próxima dose: {{ formatDate(vaccine.nextDoseDate) }}
               </div>
-              <div v-if="vaccine.veterinarian" style="font-size: 0.875rem; color: var(--color-gray-600)">
-                Veterinário: {{ vaccine.veterinarian }}
+              <div v-if="vaccine.notes" style="font-size: 0.875rem; color: var(--color-gray-600)">
+                Observações: {{ vaccine.notes }}
               </div>
             </div>
             <div style="display: flex; gap: 8px; align-items: center">
+              <Button 
+                variant="primary" 
+                size="sm"
+                icon="eye"
+                @click="$router.push(`/vaccines/${vaccine.id}?from=pet`)"
+              >
+                Ver
+              </Button>
               <Button 
                 variant="secondary" 
                 size="sm"
@@ -114,18 +122,26 @@
           <div v-for="prescription in prescriptionsList" :key="prescription.id" style="padding: var(--spacing-md); border-bottom: 1px solid var(--color-gray-200); display: flex; align-items: start; gap: 12px">
             <Icon name="pill" :size="20" style="color: var(--color-primary); flex-shrink: 0; margin-top: 2px" />
             <div style="flex: 1">
-              <div style="font-weight: 500">{{ prescription.medication }}</div>
+              <div style="font-weight: 500">{{ prescription.medicationName || prescription.medication || '-' }}</div>
               <div style="font-size: 0.875rem; color: var(--color-gray-600)">
                 Dosagem: {{ prescription.dosage }}
               </div>
-              <div style="font-size: 0.875rem; color: var(--color-gray-600)">
-                Período: {{ formatDate(prescription.startDate) }} - {{ formatDate(prescription.endDate) }}
+              <div v-if="prescription.instructions" style="font-size: 0.875rem; color: var(--color-gray-600)">
+                Instruções: {{ prescription.instructions }}
               </div>
-              <div v-if="prescription.veterinarian" style="font-size: 0.875rem; color: var(--color-gray-600)">
-                Veterinário: {{ prescription.veterinarian }}
+              <div v-if="prescription.prescribedAt" style="font-size: 0.875rem; color: var(--color-gray-600)">
+                Prescrita em: {{ formatDateTime(prescription.prescribedAt) }}
               </div>
             </div>
             <div style="display: flex; gap: 8px; align-items: center">
+              <Button 
+                variant="primary" 
+                size="sm"
+                icon="eye"
+                @click="$router.push(`/prescriptions/${prescription.id}?from=pet`)"
+              >
+                Ver
+              </Button>
               <Button 
                 variant="secondary" 
                 size="sm"
@@ -291,6 +307,10 @@ const handlePrescriptionSaved = async () => {
 
 const formatDate = (dateString) => {
   return formatters.date(dateString)
+}
+
+const formatDateTime = (dateString) => {
+  return formatters.dateTime(dateString)
 }
 
 onMounted(async () => {
