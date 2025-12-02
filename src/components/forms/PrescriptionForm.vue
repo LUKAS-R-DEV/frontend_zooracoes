@@ -44,6 +44,34 @@
               </span>
             </div>
 
+            <Input
+              id="startDate"
+              label="Data de Início"
+              type="date"
+              v-model="form.startDate"
+              :error="errors.startDate"
+              icon="calendar"
+              required
+            />
+
+            <Input
+              id="endDate"
+              label="Data de Término"
+              type="date"
+              v-model="form.endDate"
+              :error="errors.endDate"
+              icon="calendar-days"
+              required
+            />
+
+            <Input
+              id="veterinarian"
+              label="Veterinário"
+              v-model="form.veterinarian"
+              :error="errors.veterinarian"
+              icon="user"
+              placeholder="Nome do veterinário"
+            />
 
             <div class="input-group input-group-full">
               <label class="input-label" for="notes">
@@ -107,12 +135,26 @@ const isEdit = computed(() => !!props.prescriptionId)
 const form = reactive({
   medication: '',
   dosage: '',
+  startDate: '',
+  endDate: '',
+  veterinarian: '',
   notes: ''
 })
 
 const validationSchema = {
   medication: ['required', 'minLength:2'],
-  dosage: ['required', 'minLength:2']
+  dosage: ['required', 'minLength:2'],
+  startDate: ['required', 'date'],
+  endDate: ['required', 'date', (value) => {
+    if (!value) return true
+    if (!form.startDate) return true
+    const endDate = new Date(value)
+    const startDate = new Date(form.startDate)
+    if (endDate <= startDate) {
+      return 'Data de término deve ser posterior à data de início'
+    }
+    return true
+  }]
 }
 
 const { errors, validate, clearErrors } = useFormValidation(validationSchema)
@@ -129,6 +171,9 @@ const handleSubmit = async () => {
       medicationName: form.medication,
       dosage: form.dosage,
       instructions: form.notes || '',
+      startDate: form.startDate || null,
+      endDate: form.endDate || null,
+      veterinarian: form.veterinarian || null,
       petId: parseInt(props.petId)
     }
 
@@ -152,13 +197,18 @@ watch(() => props.prescriptionId, async (newId) => {
     if (prescription.value) {
       form.medication = prescription.value.medicationName || prescription.value.medication || ''
       form.dosage = prescription.value.dosage || ''
+      form.startDate = prescription.value.startDate ? (prescription.value.startDate.split('T')[0] || prescription.value.startDate) : ''
+      form.endDate = prescription.value.endDate ? (prescription.value.endDate.split('T')[0] || prescription.value.endDate) : ''
+      form.veterinarian = prescription.value.veterinarian || ''
       form.notes = prescription.value.instructions || prescription.value.notes || ''
-      // Removido startDate, endDate e veterinarian pois não existem no backend
     }
   } else {
     // Limpar formulário quando não há ID (modo criar)
     form.medication = ''
     form.dosage = ''
+    form.startDate = ''
+    form.endDate = ''
+    form.veterinarian = ''
     form.notes = ''
   }
 }, { immediate: true })

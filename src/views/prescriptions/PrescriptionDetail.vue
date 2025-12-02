@@ -49,9 +49,25 @@
               <div class="detail-value">{{ prescription.instructions || '-' }}</div>
             </div>
 
-            <div class="detail-item">
+            <div class="detail-item" v-if="prescription.startDate && prescription.endDate">
               <div class="detail-label">
                 <Icon name="calendar" :size="18" />
+                <span>Período</span>
+              </div>
+              <div class="detail-value">{{ formatDate(prescription.startDate) }} - {{ formatDate(prescription.endDate) }}</div>
+            </div>
+
+            <div class="detail-item" v-if="prescription.veterinarian">
+              <div class="detail-label">
+                <Icon name="user" :size="18" />
+                <span>Veterinário</span>
+              </div>
+              <div class="detail-value">{{ prescription.veterinarian }}</div>
+            </div>
+
+            <div class="detail-item">
+              <div class="detail-label">
+                <Icon name="calendar-clock" :size="18" />
                 <span>Data da Prescrição</span>
               </div>
               <div class="detail-value">{{ formatDateTime(prescription.prescribedAt) }}</div>
@@ -111,6 +127,11 @@ const { prescription, loading, error, fetchPrescription } = usePrescriptions()
 const { pet, fetchPet } = usePets()
 
 const petName = ref('')
+
+const formatDate = (dateString) => {
+  if (!dateString) return '-'
+  return formatters.date(dateString)
+}
 
 const formatDateTime = (dateString) => {
   if (!dateString) return '-'

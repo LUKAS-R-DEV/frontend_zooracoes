@@ -102,4 +102,3 @@ A configuração de CORS já está configurada no backend para permitir requisi�
 - 📋 Consultar [Requisitos Funcionais](../docs/DocumentoMVP.md#7-requisitos-funcionais-rf)
 - 💻 Ver [Tecnologias Utilizadas](../docs/DocumentoMVP.md#21-tecnologias-e-infraestrutura)
 
-# frontend_zooracoes
